@@ -9,7 +9,6 @@ use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\Middleware\ThrottlesExceptions;
 use Illuminate\Queue\SerializesModels;
 
 class ProcessPiece implements ShouldQueue
@@ -18,6 +17,35 @@ class ProcessPiece implements ShouldQueue
 
     private $piece;
     private $guzzle;
+
+    /**
+     * The number of times the job may be attempted.
+     *
+     * @var int
+     */
+    public $tries = 5;
+
+    /**
+     * The maximum number of unhandled exceptions to allow before failing.
+     *
+     * @var int
+     */
+    public $maxExceptions = 3;
+
+
+    /**
+     * The number of seconds the job can run before timing out.
+     *
+     * @var int
+     */
+    public $timeout = 120;
+
+    /**
+     * Indicate if the job should be marked as failed on timeout.
+     *
+     * @var bool
+     */
+    public $failOnTimeout = true;
 
     /**
      * Create a new job instance.
@@ -30,26 +58,6 @@ class ProcessPiece implements ShouldQueue
     }
 
     /**
-     * Get the middleware the job should pass through.
-     *
-     * @return array
-     */
-    public function middleware()
-    {
-        return [(new ThrottlesExceptions(10, 5))->backoff(5)];
-    }
-
-    /**
-     * Determine the time at which the job should timeout.
-     *
-     * @return \DateTime
-     */
-    public function retryUntil()
-    {
-        return now()->addMinutes(5);
-    }
-
-    /**
      * Execute the job.
      *
      * @return void
@@ -58,7 +66,7 @@ class ProcessPiece implements ShouldQueue
     {
         $this->guzzle = new Client();
 
-        $url = $this->setDataUrl($this->piece);
+        $url = env('DATA_URL') . $this->piece . '&returnGeometry=false&spatialRel=esriSpatialRelIntersects&outFields=nrinscr,tplogradou,nmlogradou,cdlogradou,nrimovel,incompl,nrquadra,nrlote,nmbairro,cdbairro,ttsublot,insubprinc,nrfrenter,areaterr,areatest,areaedif,propriedad,situacao,topografia,nivel,solo,uso,uso1,formauso,cdedificio,nmedificio,nrpaviment,localizac,nrelevador,nrvagascob,nrvagasdes,nrgaragem,tpedif1,tpedif2,posicaoedf,estrutura,esquadria,piso,forro,insteletri,vlvenal,ininstsani,revinterno,acinterno,revexterno,acexterno,cobertura,conserva,agua,esgoto,ocupacao,fecho,passeio,nrarvores,nrpostes,pontedific,VALR_M2_EDF_LAN,VALR_M2_TERRENO_LAN,VALR_M2_ZPA_LAN';
 
         try {
             $response = $this->guzzle->request(
@@ -76,10 +84,5 @@ class ProcessPiece implements ShouldQueue
         } catch (\Exception $e) {
             throw $e;
         }
-    }
-
-    private function setDataUrl(string $cod)
-    {
-        return env('DATA_URL') . $cod . '&returnGeometry=false&spatialRel=esriSpatialRelIntersects&outFields=nrinscr,tplogradou,nmlogradou,cdlogradou,nrimovel,incompl,nrquadra,nrlote,nmbairro,cdbairro,ttsublot,insubprinc,nrfrenter,areaterr,areatest,areaedif,propriedad,situacao,topografia,nivel,solo,uso,uso1,formauso,cdedificio,nmedificio,nrpaviment,localizac,nrelevador,nrvagascob,nrvagasdes,nrgaragem,tpedif1,tpedif2,posicaoedf,estrutura,esquadria,piso,forro,insteletri,vlvenal,ininstsani,revinterno,acinterno,revexterno,acexterno,cobertura,conserva,agua,esgoto,ocupacao,fecho,passeio,nrarvores,nrpostes,pontedific,VALR_M2_EDF_LAN,VALR_M2_TERRENO_LAN,VALR_M2_ZPA_LAN';
     }
 }
