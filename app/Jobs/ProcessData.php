@@ -2,6 +2,8 @@
 
 namespace App\Jobs;
 
+use App\Models\Data;
+use GuzzleHttp\Client;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -15,14 +17,18 @@ class ProcessData implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    public $setor;
+    private $guzzle;
+    private $url;
+
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct()
+    public function __construct($setor)
     {
-        //
+        $this->setor = $setor;
     }
 
     /**
@@ -52,6 +58,19 @@ class ProcessData implements ShouldQueue
      */
     public function handle()
     {
-        Artisan::call('get:data');
+        $this->guzzle = new Client();
+
+        $response = $this->guzzle->request(
+            'GET',
+            env('SETORES_URL') . $this->setor . '&returnGeometry=false&spatialRel=esriSpatialRelIntersects&outFields=ci,nrinscr'
+        );
+
+        $data = json_decode($response->getBody()->getContents());
+        $imoveis = $data->features;
+
+        foreach ($imoveis as $imovel) {
+            $cod = $imovel->attributes->nrinscr;
+            ProcessPiece::dispatch($cod);
+        }
     }
 }
