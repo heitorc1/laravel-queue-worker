@@ -10,6 +10,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 
 class ProcessPiece implements ShouldQueue
 {
@@ -55,7 +56,6 @@ class ProcessPiece implements ShouldQueue
     public function __construct($piece)
     {
         $this->piece = $piece;
-        $this->guzzle = new Client();
     }
 
     /**
@@ -77,7 +77,8 @@ class ProcessPiece implements ShouldQueue
             $data = json_decode($response->getBody()->getContents());
             if (!empty($data->features)) {
                 $attributes = (array) $data->features[0]->attributes;
-                Data::firstOrCreate(
+                Log::info('Trying to insert ' . $attributes['nrinscr']);
+                $data = Data::firstOrCreate(
                     ['nrinscr' => $attributes['nrinscr']],
                     $attributes
                 );

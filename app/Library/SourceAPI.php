@@ -8,13 +8,6 @@ use GuzzleHttp\Client;
 
 class SourceAPI
 {
-  private $guzzle;
-
-  public function __construct(Client $guzzle)
-  {
-    $this->guzzle = $guzzle;
-  }
-
   public function process()
   {
     try {

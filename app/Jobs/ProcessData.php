@@ -55,7 +55,6 @@ class ProcessData implements ShouldQueue
     public function __construct($setor)
     {
         $this->setor = $setor;
-        $this->guzzle = new Client();
     }
 
     /**
@@ -75,6 +74,8 @@ class ProcessData implements ShouldQueue
      */
     public function handle()
     {
+        $this->guzzle = new Client();
+
         $response = $this->guzzle->request(
             'GET',
             env('SETORES_URL') . $this->setor . '&returnGeometry=false&spatialRel=esriSpatialRelIntersects&outFields=ci,nrinscr'

@@ -14,4 +14,4 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', [ProcessController::class, 'start']);
+Route::get('/start', [ProcessController::class, 'start']);
