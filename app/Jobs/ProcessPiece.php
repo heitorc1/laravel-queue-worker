@@ -55,6 +55,7 @@ class ProcessPiece implements ShouldQueue
     public function __construct($piece)
     {
         $this->piece = $piece;
+        $this->guzzle = new Client();
     }
 
     /**
