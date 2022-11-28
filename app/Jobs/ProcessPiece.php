@@ -24,14 +24,14 @@ class ProcessPiece implements ShouldQueue
      *
      * @var int
      */
-    public $tries = 5;
+    public $tries = 25;
 
     /**
      * The maximum number of unhandled exceptions to allow before failing.
      *
      * @var int
      */
-    public $maxExceptions = 3;
+    public $maxExceptions = 10;
 
 
     /**
@@ -39,7 +39,7 @@ class ProcessPiece implements ShouldQueue
      *
      * @var int
      */
-    public $timeout = 120;
+    public $timeout = 300;
 
     /**
      * Indicate if the job should be marked as failed on timeout.
@@ -47,6 +47,7 @@ class ProcessPiece implements ShouldQueue
      * @var bool
      */
     public $failOnTimeout = true;
+
 
     /**
      * Create a new job instance.
