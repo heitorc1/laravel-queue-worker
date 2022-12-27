@@ -170,17 +170,15 @@ return [
             'queue' => ['high'],
             'balance' => 'auto',
             'minProcesses' => 1,
-            'maxProcesses' => 3,
             'balanceMaxShift' => 1,
             'balanceCooldown' => 3,
-            'tries' => 3,
+            'tries' => 10,
         ],
         'supervisor-2' => [
             'connection' => 'redis',
             'queue' => ['low'],
             'balance' => 'auto',
             'minProcesses' => 1,
-            'maxProcesses' => 5,
             'balanceMaxShift' => 1,
             'balanceCooldown' => 3,
             'tries' => 3,
@@ -190,15 +188,19 @@ return [
     'environments' => [
         'production' => [
             'supervisor-1' => [
-                'maxProcesses' => 10,
-                'balanceMaxShift' => 1,
-                'balanceCooldown' => 3,
+                'maxProcesses' => 3,
+            ],
+            'supervisor-2' => [
+                'maxProcesses' => 5,
             ],
         ],
 
         'local' => [
             'supervisor-1' => [
-                'maxProcesses' => 3,
+                'maxProcesses' => 1,
+            ],
+            'supervisor-1' => [
+                'maxProcesses' => 2,
             ],
         ],
     ],
