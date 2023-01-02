@@ -16,6 +16,7 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         $schedule->command('process:jobs')->monthlyOn('23');
+        $schedule->command('queue:retry all')->daily();
     }
 
     /**
